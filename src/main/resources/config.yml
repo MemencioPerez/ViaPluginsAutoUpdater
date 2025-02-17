@@ -1,0 +1,19 @@
+# ViaPluginsAutoUpdater configuration
+check-interval: 1440 # Interval when to check for updates in minutes
+
+plugins:
+  VIAVERSION:
+    enabled: true # Enable or disable plugin updates
+    release-type: RELEASE # The version type to download. Options: RELEASE (default), SNAPSHOT, JAVA8
+
+  VIABACKWARDS:
+    enabled: true
+    release-type: RELEASE
+
+  VIAREWIND:
+    enabled: true
+    release-type: RELEASE
+
+  VIAREWIND_LEGACY_SUPPORT:
+    enabled: true
+    release-type: RELEASE

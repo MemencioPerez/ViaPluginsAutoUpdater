@@ -1,0 +1,6 @@
+name: ViaPluginsAutoUpdater
+version: ${version}
+main: me.memencio.viapluginsautoupdater.ViaPluginsAutoUpdater
+api-version: '1.13'
+authors: [ MemencioPerez ]
+website: https://github.com/MemencioPerez/ViaPluginsAutoUpdater

@@ -1,0 +1,80 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id 'java'
+    id "com.gradleup.shadow" version '9.0.0-beta8'
+    id "xyz.jpenilla.run-paper" version "2.3.1"
+}
+
+group = 'me.memencio'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigotmc-repo"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+}
+
+dependencies {
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    shadow('org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT')
+    shadow("com.github.zafarkhaja:java-semver:0.10.2")
+}
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:-options'
+
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    finalizedBy 'shadowJar'
+    manifest {
+        attributes(
+                'paperweight-mappings-namespace': 'mojang'
+        )
+    }
+}
+
+tasks.named('shadowJar', ShadowJar) {
+    configurations = [project.configurations.shadow]
+    archiveClassifier = ''
+
+    relocate 'org.spongepowered.configurate', 'me.memencio.viapluginsautoupdater.libs.configurate'
+    relocate 'io.leangen.geantyref', 'me.memencio.viapluginsautoupdater.libs.geantyref'
+    relocate 'com.github.zafarkhaja.semver', 'me.memencio.viapluginsautoupdater.libs.semver'
+}
+
+tasks {
+    runServer {
+        minecraftVersion("1.21.4")
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
